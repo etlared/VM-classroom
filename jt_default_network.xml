@@ -1,0 +1,8 @@
+<network connections='2'>
+  <name>jt_default</name>
+  <bridge name='virbr4' stp='on' delay='0'/>
+  <mac address='52:54:00:6d:23:7d'/>
+  <domain name='jt_default'/>
+  <ip address='192.168.224.1' netmask='255.255.255.0'>
+  </ip>
+</network>
