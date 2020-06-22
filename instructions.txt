@@ -46,13 +46,20 @@ You need two networks in libvirt:
 
  systemctl restart libvirtd
  
+ There is a reason to use a CNAME and not A record (hostname of your server)for your certificates.
+ SPICE connection will fail if .vv file points the host to 127.0.0.1 where the ports are actually opened,
+ because the CN is not correct.
+ I solved this by adding the CNAME FQDN to /etc/hosts on the libvirt server to the 127.0.0.1 entry.
+ 
+ I connected to foundation0 with virt-manager running on my workstation over SSH.
+ 
  *Configuring SQUID proxy*
  Install the package and change the /etc/squid/squid.conf to only allow the whole world to connect to
  localhost ports on the libvirt server where SPICE consoles are available secured with a password.
  
 acl SPICE_HOSTS dst 127.0.0.1/32
 acl SPICE_CLIENTS src all
-acl SPICE_PORTS port 5940-5999
+acl SPICE_PORTS port 5981-5999
 http_access allow SPICE_HOSTS
 http_access allow SPICE_PORTS
 http_access allow SPICE_CLIENTS
