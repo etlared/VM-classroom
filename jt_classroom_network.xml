@@ -1,0 +1,6 @@
+<network connections='15'>
+  <name>jt_classroom</name>
+  <bridge name='virbr3' stp='on' delay='0'/>
+  <mac address='52:54:00:fd:db:85'/>
+  <domain name='jt_classroom'/>
+</network>
