@@ -153,7 +153,7 @@
     <input type='keyboard' bus='ps2'>
       <alias name='input2'/>
     </input>
-    <graphics type='spice' port='5952' tlsPort='5992' autoport='no' listen='127.0.0.1'>
+    <graphics type='spice' port='5952' tlsPort='5992' autoport='no' listen='127.0.0.1' passwd='CHANGEME'>
       <listen type='address' address='127.0.0.1'/>
     </graphics>
     <sound model='ich9'>
