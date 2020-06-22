@@ -88,6 +88,9 @@ They have a password set for SPICE graphics (change it for your system). I used 
 because the VMs are going away after the week is over and I am going to change the password for other classes anyway.
 They change the qemu command so that SPICE allows more than one connection to a VM, which allows me to actually
 help the student.
+  <qemu:commandline>
+    <qemu:env name='SPICE_DEBUG_ALLOW_MC' value='1'/>
+  </qemu:commandline>
 foundation0 is using 5940 and 5980 (tls)ports
 foundation1 is using 5941 and 5981 ports
 foundation2 is using 5942 and 5982 ports
