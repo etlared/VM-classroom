@@ -106,9 +106,23 @@ foundation10 is using 5950 and 5990 ports
 ...
 foundation14 is using 5954 and 5994 ports
 
+Remember to replace CHANGEME password with your own.
+
+create qcow2 images in /var/lib/libvirt/images, define libvirt domains.
+
+for I in {0..14}; do qemu-img create -f qcow2 -o size=250G /var/lib/libvirt/images/jt_f${I}.qcow2; done
+
+and from the directory where you put foundationX.xml files
+
+for FILE in foundation*.xml; do virsh define ${FILE}; done
+
+
 * virt-manager and remote-viewer session files (.vv)*
 
 They will instruct the viewer to connect to SPICE over the proxy port. Pay attention to how CA certificate in PEM format
 is written as a single string and newlines in PEM file were replaced by "\n". I have lost more time on this than anything else except waiting for USB to upload over 100Mbit/s connection.
 
 Remember to replace my CA with YOUR CA!!!
+Replace CHANGEME password with yours which should be the same in foundationX.xml files.
+Replace your.server.fqdn with your server's CNAME FQDN which was also used when creating server certificate.
+
