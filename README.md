@@ -17,4 +17,4 @@ Mac OS X clients: https://johnsiu.com/blog/macos-kvm-remote-connect/
                   https://github.com/jeffreywildman/homebrew-virt-manager
 
 
- 
+ This has allowed me to install foundation0 and 14 foundationX machines for CL310 on a single 32 core EPYC server with 384GiB RAM and two drives (240GB SSD for OS and default libvirt storage and a 3TB Toshiba nVME drive). KSM was saving 100GB of RAM.
