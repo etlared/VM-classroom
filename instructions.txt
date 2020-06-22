@@ -1,0 +1,95 @@
+*Configuring Libvirt*
+
+Add these settings in /etc/modprobe.d/kvm.conf and reboot the server.
+options kvm_intel nested=1
+options kvm_amd nested=1
+
+You need two networks in libvirt:
+ - jt_default is going to be used for Internet access in foundation0
+     a clone of default libvirt network but with a different subnet (192.168.224.0/24) because foundationX
+     also comes with a default network in libvirt and you want to avoid having the same 192.168.122.0/24 subnet.
+ - jt_classroom is an "Isolated network, internal and host routing only" *without DHCP* 
+     (foundation0 is going to have a DHCP service in this ethernet network)
+ 
+ If you have other storage pools available on your server and you want to use them you will need to modify the
+ foundationX XML files.
+ I have used the default /var/lib/libvirt/images for foundation0 and /srv/classroom for others because
+ classroom is on a separate 3TB nVME drive.
+ 
+ mkdir /etc/pki/CA
+ mkdir -p /etc/pki/libvirt/private
+ chgrp -R qemu /etc/pki/libvirt/
+ chmod 750 /etc/pki/libvirt/private
+ copy "CA cert" to /etc/pki/CA/cacert.pem
+ copy "server cert" to /etc/pki/libvirt/servercert.pem
+ copy "private key" to /etc/pki/libvirt/private/serverkey.pem
+ chmod 440 /etc/pki/libvirt/private/serverkey.pem
+ restorecon -RF /etc/pki
+ 
+ You need to edit /etc/libvirt/libvirtd.conf and change these settings:
+ 
+ listen_tcp = 1
+ tls_no_verify_certificate = 1
+
+ systemctl restart libvirtd
+ 
+ *Configuring qemu*
+ 
+ mkdir /etc/pki/qemu
+ cp /etc/pki/CA/cacert.pem /etc/pki/qemu/ca-cert.pem
+ cp /etc/pki/libvirt/servercert.pem /etc/pki/qemu/server-cert.pem
+ cp /etc/pki/libvirt/private/serverkey.pem /etc/pki/qemu/server-key.pem
+ restorecon -RF /etc/pki
+ 
+ You need to edit /etc/libvirt/qemu.conf and change this setting:
+ spice_tls = 1
+
+ systemctl restart libvirtd
+ 
+ *Configuring SQUID proxy*
+ Install the package and change the /etc/squid/squid.conf to only allow the whole world to connect to
+ localhost ports on the libvirt server where SPICE consoles are available secured with a password.
+ 
+acl SPICE_HOSTS dst 127.0.0.1/32
+acl SPICE_CLIENTS src all
+acl SPICE_PORTS port 5940-5999
+http_access allow SPICE_HOSTS
+http_access allow SPICE_PORTS
+http_access allow SPICE_CLIENTS
+acl CONNECT method CONNECT
+
+#http_access deny CONNECT !SSL_ports
+http_access deny CONNECT !SPICE_PORTS
+
+# Squid normally listens to port 3128
+http_port 4827
+
+systemctl restart squid
+
+*Configure firewalld*
+
+put the squid.xml file in /etc/firewalld/services/squid.xml
+firewall-cmd --add-service=squid
+
+That will take care of allowing SPICE clients to connect with TLS to SPICE console ports that are only bound to
+localhost on libvirt server.
+
+*Upload the image of your physical RHTINST USB key to your server*
+
+My USB key was inserted into my notebook and it was presented as /dev/sdc
+dd if=/dev/sdc | ssh -i id_rsa.pem user@yourserver \
+'dd of=/var/lib/libvirt/images/rhtinst-usb.img conv=sparse status=progress'
+
+*Foundation X domain XML files*
+
+A few notes about them:
+You should use virtio-scsi (less prone to become non-responsive and it supports TRIM or discard).
+They have a password set for SPICE graphics (change it for your system). I used the same because the VMs are
+going away after the week is over and I am going to change the password for other classes anyway.
+They change the qemu command so that SPICE allows more than one connection to a VM, which allows me to actually
+help the student.
+
+* virt-manager and remote-viewer session files (.vv)*
+
+They will instruct the viewer to connect to SPICE over the proxy port. Pay attention how CA certificate in PEM format
+is written as a single string and newlines in PEM file were replaced by "\n".
