@@ -103,3 +103,5 @@ foundation14 is using 5954 and 5994 ports
 
 They will instruct the viewer to connect to SPICE over the proxy port. Pay attention to how CA certificate in PEM format
 is written as a single string and newlines in PEM file were replaced by "\n". I have lost more time on this than anything else except waiting for USB to upload over 100Mbit/s connection.
+
+Remember to replace my CA with YOUR CA!!!
